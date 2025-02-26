@@ -103,9 +103,15 @@ export const useSyncStore = createPersistStore(
           );
           return;
         } else {
-          const parsedRemoteState = JSON.parse(
-            await client.get(config.username),
-          ) as AppState;
+          try {
+            const parsedRemoteState = JSON.parse(
+              await client.get(config.username),
+            ) as AppState;
+          } catch (e) {
+             console.log("[Sync] failed to get remote state, need fix part", e);
+             await client.fix_part(config.username, JSON.stringify(localState));
+             throw e;
+          }
           mergeAppState(localState, parsedRemoteState);
           setLocalAppState(localState);
         }
