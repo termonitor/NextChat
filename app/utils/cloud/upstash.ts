@@ -82,6 +82,42 @@ export function createUpstashClient(store: SyncStore) {
       await this.redisSet(chunkCountKey, index.toString());
     },
 
+    async fix_part(_: string, value: string) {
+      const chunkCount = Number(await this.redisGet(chunkCountKey));
+      if (!Number.isInteger(chunkCount)) return;
+
+      const chunks = await Promise.all(
+        new Array(chunkCount)
+          .fill(0)
+          .map((_, i) => this.redisGet(chunkIndexKey(i))),
+      );
+
+      // 检查 chunks 数组中是否有 null 元素，并记录其下标
+      const nullIndices = [];
+      chunks.forEach((chunk, index) => {
+          if (chunk === null) {
+              nullIndices.push(index);
+          }
+      });
+      
+      // 输出 null 元素的下标
+      if (nullIndices.length > 0) {
+          console.log("Chunks 中 null 元素的下标：", nullIndices);
+          let part_index = nullIndices[0];
+          // 重推该下标对应的数据
+          let index = 0;
+          for await (const chunk of chunks(value)) {
+            if (index!= part_index) {
+                index += 1;
+                continue;
+            } else {
+                await this.redisSet(this.chunkIndexKey(index), chunk);
+                index += 1;
+            }
+          }
+      }
+    },
+
     headers() {
       return {
         Authorization: `Bearer ${config.apiKey}`,
