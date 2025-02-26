@@ -44,6 +44,6 @@ export function* chunks(s: string, maxBytes = 1000 * 1000) {
       }
       // This is a safe cut - off point; never half - way a multi - byte
       yield decoder.decode(buf.slice(0, i));
-      buf = buf.slice(i); // Skip space (if any)
+      buf = buf.slice(i+1); // Skip space (if any)
   }
 }
