@@ -43,7 +43,11 @@ export function* chunks(s: string, maxBytes = 1000 * 1000) {
           }
       }
       // This is a safe cut - off point; never half - way a multi - byte
-      yield decoder.decode(buf.slice(0, i));
-      buf = buf.slice(i+1); // Skip space (if any)
+      // yield decoder.decode(buf.slice(0, i));
+      // buf = buf.slice(i+1); // Skip space (if any)
+      // 生成当前块，这里包含分割点字符
+      yield decoder.decode(buf.slice(0, i + (i < buf.length? 1 : 0)));
+      // 更新剩余的缓冲区
+      buf = buf.slice(i + (i < buf.length? 1 : 0));
   }
 }
