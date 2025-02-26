@@ -93,7 +93,7 @@ export function createUpstashClient(store: SyncStore) {
       );
 
       // 检查 chunks 数组中是否有 null 元素，并记录其下标
-      const nullIndices = [];
+      const nullIndices: number[] = [];
       chunks.forEach((chunk, index) => {
           if (chunk === null) {
               nullIndices.push(index);
@@ -107,13 +107,11 @@ export function createUpstashClient(store: SyncStore) {
           // 重推该下标对应的数据
           let index = 0;
           for await (const chunk of chunks(value)) {
-            if (index!= part_index) {
-                index += 1;
-                continue;
-            } else {
-                await this.redisSet(this.chunkIndexKey(index), chunk);
-                index += 1;
+            if (index === part_index) {
+                // 重推该下标对应的数据
+                await this.redisSet(chunkIndexKey(index), chunk);
             }
+            index++;
           }
       }
     },
