@@ -64,6 +64,11 @@ export function createUpstashClient(store: SyncStore) {
       return chunks.join("");
     },
 
+    // 定义一个辅助函数，用于延迟指定的毫秒数
+    function delay(ms: number) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     async set(_: string, value: string) {
       // upstash limit the max request size which is 1Mb for “Free” and “Pay as you go”
       // so we need to split the data to chunks
