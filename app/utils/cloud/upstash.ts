@@ -66,6 +66,7 @@ export function createUpstashClient(store: SyncStore) {
           .map((_, i) => this.redisGet(chunkIndexKey(i))),
       );
       console.log("[Upstash] get full chunks", chunks);
+      console.log("[Upstash] get full chunks info", chunks.join(""));
       return chunks.join("");
     },
 
