@@ -12,7 +12,7 @@ export function prettyObject(msg: any) {
   return ["```json", msg, "```"].join("\n");
 }
 
-export function* chunks(s: string, maxBytes = 1000 * 1000) {
+export function* chunks(s: string, maxBytes = 500 * 1000) {
   const decoder = new TextDecoder("utf-8");
   let buf = new TextEncoder().encode(s);
   while (buf.length) {
