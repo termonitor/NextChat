@@ -123,7 +123,7 @@ export const useSyncStore = createPersistStore(
           } catch (e) {
               console.log("[Sync] failed to get remote state, need fix part", e);
               // 尝试修复部分数据
-              await client.fix_part(config.username, JSON.stringify(localState));
+              // await client.fix_part(config.username, JSON.stringify(localState));
               // 这里可以选择不抛出错误，或者根据实际情况进行更合适的处理
               throw e; 
           }
