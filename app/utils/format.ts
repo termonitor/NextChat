@@ -13,16 +13,37 @@ export function prettyObject(msg: any) {
 }
 
 export function* chunks(s: string, maxBytes = 500 * 1000) {
+  // const decoder = new TextDecoder("utf-8");
+  // let buf = new TextEncoder().encode(s);
+  // while (buf.length) {
+  //   let i = buf.lastIndexOf(32, maxBytes + 1);
+  //   // If no space found, try forward search
+  //   if (i < 0) i = buf.indexOf(32, maxBytes);
+  //   // If there's no space at all, take all
+  //   if (i < 0) i = buf.length;
+  //   // This is a safe cut-off point; never half-way a multi-byte
+  //   yield decoder.decode(buf.slice(0, i));
+  //   buf = buf.slice(i + 1); // Skip space (if any)
+  // }
+
   const decoder = new TextDecoder("utf-8");
   let buf = new TextEncoder().encode(s);
   while (buf.length) {
-    let i = buf.lastIndexOf(32, maxBytes + 1);
-    // If no space found, try forward search
-    if (i < 0) i = buf.indexOf(32, maxBytes);
-    // If there's no space at all, take all
-    if (i < 0) i = buf.length;
-    // This is a safe cut-off point; never half-way a multi-byte
-    yield decoder.decode(buf.slice(0, i));
-    buf = buf.slice(i + 1); // Skip space (if any)
+      let i = buf.lastIndexOf(32, maxBytes + 1);
+      // If no space found, try forward search
+      if (i < 0) {
+          i = buf.indexOf(32, maxBytes);
+      }
+      // If still no space found, split at maxBytes while ensuring valid UTF - 8
+      if (i < 0) {
+          i = maxBytes;
+          // Move the index back to ensure it's not in the middle of a multi - byte character
+          while (i > 0 && (buf[i] & 0xC0) === 0x80) {
+              i--;
+          }
+      }
+      // This is a safe cut - off point; never half - way a multi - byte
+      yield decoder.decode(buf.slice(0, i));
+      buf = buf.slice(i + 1); // Skip space (if any)
   }
 }
