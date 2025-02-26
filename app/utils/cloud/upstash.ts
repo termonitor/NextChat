@@ -5,6 +5,11 @@ import { chunks } from "../format";
 export type UpstashConfig = SyncStore["upstash"];
 export type UpStashClient = ReturnType<typeof createUpstashClient>;
 
+// 定义一个辅助函数，用于延迟指定的毫秒数
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export function createUpstashClient(store: SyncStore) {
   const config = store.upstash;
   const storeKey = config.username.length === 0 ? STORAGE_KEY : config.username;
@@ -63,11 +68,6 @@ export function createUpstashClient(store: SyncStore) {
       console.log("[Upstash] get full chunks", chunks);
       return chunks.join("");
     },
-
-    // 定义一个辅助函数，用于延迟指定的毫秒数
-    function delay(ms: number) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
 
     async set(_: string, value: string) {
       // upstash limit the max request size which is 1Mb for “Free” and “Pay as you go”
