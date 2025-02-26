@@ -86,15 +86,15 @@ export function createUpstashClient(store: SyncStore) {
       const chunkCount = Number(await this.redisGet(chunkCountKey));
       if (!Number.isInteger(chunkCount)) return;
 
-      const chunks = await Promise.all(
+      const data_chunks = await Promise.all(
         new Array(chunkCount)
           .fill(0)
           .map((_, i) => this.redisGet(chunkIndexKey(i))),
       );
 
-      // 检查 chunks 数组中是否有 null 元素，并记录其下标
+      // 检查 data_chunks 数组中是否有 null 元素，并记录其下标
       const nullIndices: number[] = [];
-      chunks.forEach((chunk, index) => {
+      data_chunks.forEach((chunk, index) => {
           if (chunk === null) {
               nullIndices.push(index);
           }
@@ -102,7 +102,7 @@ export function createUpstashClient(store: SyncStore) {
       
       // 输出 null 元素的下标
       if (nullIndices.length > 0) {
-          console.log("Chunks 中 null 元素的下标：", nullIndices);
+          console.log("data_chunks 中 null 元素的下标：", nullIndices);
           let part_index = nullIndices[0];
           // 重推该下标对应的数据
           let index = 0;
