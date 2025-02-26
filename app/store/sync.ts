@@ -103,17 +103,37 @@ export const useSyncStore = createPersistStore(
           );
           return;
         } else {
+          // try {
+          //   const parsedRemoteState = JSON.parse(
+          //     await client.get(config.username),
+          //   ) as AppState;
+          // } catch (e) {
+          //    console.log("[Sync] failed to get remote state, need fix part", e);
+          //    await client.fix_part(config.username, JSON.stringify(localState));
+          //    throw e;
+          // }
+          // mergeAppState(localState, parsedRemoteState);
+          // setLocalAppState(localState);
+
+          let parsedRemoteState: AppState | null = null;
           try {
-            const parsedRemoteState = JSON.parse(
-              await client.get(config.username),
-            ) as AppState;
+              // 从客户端获取远程状态并解析为 JSON
+              const remoteStateJson = await client.get(config.username);
+              parsedRemoteState = JSON.parse(remoteStateJson) as AppState;
           } catch (e) {
-             console.log("[Sync] failed to get remote state, need fix part", e);
-             await client.fix_part(config.username, JSON.stringify(localState));
-             throw e;
+              console.log("[Sync] failed to get remote state, need fix part", e);
+              // 尝试修复部分数据
+              await client.fix_part(config.username, JSON.stringify(localState));
+              // 这里可以选择不抛出错误，或者根据实际情况进行更合适的处理
+              throw e; 
           }
-          mergeAppState(localState, parsedRemoteState);
-          setLocalAppState(localState);
+          
+          if (parsedRemoteState) {
+              // 合并本地状态和远程状态
+              mergeAppState(localState, parsedRemoteState);
+              // 设置本地应用状态
+              setLocalAppState(localState);
+          }
         }
       } catch (e) {
         console.log("[Sync] failed to get remote state", e);
