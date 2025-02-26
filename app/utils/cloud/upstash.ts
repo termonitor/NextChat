@@ -70,6 +70,8 @@ export function createUpstashClient(store: SyncStore) {
       let index = 0;
       for await (const chunk of chunks(value)) {
         await this.redisSet(chunkIndexKey(index), chunk);
+        // wait 2 second
+        await delay(2000);
         index += 1;
       }
       await this.redisSet(chunkCountKey, index.toString());
